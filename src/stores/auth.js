@@ -8,12 +8,14 @@ export const useAuthStore = defineStore({
     state: () => ({
         user: sessionStorage.user ? JSON.parse(sessionStorage.getItem("user")) : null,
         authenticated: sessionStorage.user
-        ? JSON.parse(sessionStorage.getItem("user"))
-        : false,
+            ? JSON.parse(sessionStorage.getItem("user"))
+            : false,
+        roles: sessionStorage.user ? JSON.parse(sessionStorage.getItem("roles")) : null,
     }),
 
     getters: {
         authUser: (state) => state.user,
+        getRoles: (state) => state.roles
         // authenticated: (state) => state.user !== null,
     },
 
@@ -21,12 +23,12 @@ export const useAuthStore = defineStore({
         async login(params) {
             await repository.login(params)
                 .then(response => {
-                    console.log(response.data);
                     this.user = response.data.result.user;
-                    console.log(this.user)
+                    this.roles = response.data.result.roles;
                     sessionStorage.setItem("user", JSON.stringify(response.data.result.user));
                     sessionStorage.setItem("access_token", JSON.stringify(response.data.result.access_token))
                     sessionStorage.setItem("authenticated", true);
+                    sessionStorage.setItem("roles", JSON.stringify(response.data.result.roles));
                     location.reload()
                 })
                 .catch((err) => {
@@ -50,6 +52,7 @@ export const useAuthStore = defineStore({
             sessionStorage.removeItem("user");
             sessionStorage.removeItem("access_token");
             sessionStorage.removeItem("authenticated");
+            sessionStorage.removeItem("roles");
             location.reload()
         },
     }

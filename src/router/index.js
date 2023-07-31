@@ -31,6 +31,34 @@ const router = createRouter({
         title: `${import.meta.env.VITE_APP_TITLE}`,
       },
       beforeEnter: middleware.user,
+      children: [
+        {
+          path: "/voucher",
+          name: "voucher",
+          component: () => import("../views/Voucher/Index.vue"),
+          meta: {
+            title: `Voucher | ${import.meta.env.VITE_APP_TITLE}`,
+          },
+        },
+        {
+          path: "/groups",
+          name: "groups",
+          component: () => import("../views/Groups/Index.vue"),
+          meta: {
+            title: `Group | ${import.meta.env.VITE_APP_TITLE}`,
+          },
+          roles: ['SuperAdmin', 'GroupAdmin']
+        },
+        {
+          path: "/Users",
+          name: "Users",
+          component: () => import("../views/Users/Index.vue"),
+          meta: {
+            title: `Users | ${import.meta.env.VITE_APP_TITLE}`,
+            roles: ['SuperAdmin']
+          },
+        },
+      ]
     },
   ]
 })

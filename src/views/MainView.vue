@@ -1,5 +1,5 @@
 <template>
-  <h1>You are logged in!</h1>
+  <router-view></router-view>
 </template>
 
 <script>

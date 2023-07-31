@@ -7,13 +7,13 @@
         </div>
         <div class="hidden md:flex items-center space-x-6">
           <router-link to="/voucher" class="text-white">Voucher</router-link>
-          <router-link to="/group" class="text-white">Group</router-link>
-          <router-link to="/users" class="text-white">Users</router-link>
+          <router-link to="/groups" v-if="authStore?.getRoles.includes('SuperAdmin') || authStore?.getRoles.includes('GroupAdmin')" class="text-white">Groups</router-link>
+          <router-link to="/users" v-if="authStore?.getRoles.includes('SuperAdmin')" class="text-white">Users</router-link>
+          <a class="text-white cursor-pointer" @click="logout">Logout</a>
           <div class="flex space-x-4 items-center">
-            <div class="text-white text-lg sm:text-xl">
-              Logged in as {{authStore.getUser?.name}}
+            <div class="text-white border-white px-2 py-2 border-1 rounded-sm">
+              {{authStore.authUser?.name}}
             </div>
-            <a class="text-white cursor-pointer" @click="logout">Logout</a>
           </div>
         </div>
         <div class="md:hidden">
