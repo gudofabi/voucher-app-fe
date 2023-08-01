@@ -16,10 +16,32 @@ export const useVoucherStore = defineStore({
         lastPage: null,
         totalPages: null,
         meta: null,
+        links: null
     }),
 
     getters: {
-        getVouchers: (state) => state.vouchers
+        getVouchers: (state) => state.vouchers,
+        getLinks: state => {
+            let newLinks = [];
+
+            if(state.meta){
+                state.meta.links.forEach(link => {
+                    if(link.label != 'Next &raquo;' && link.label != '&laquo; Previous') {
+                        newLinks.push(link);
+                    }
+                })
+            }
+            return newLinks;
+        },
+        getPaginationNo: state => {
+            const number = (state.paginationNo - Math.floor(state.paginationNo) != 0);
+
+            if(number) {
+                return parseInt(state.paginationNo) + 1;
+            } else {
+                return state.paginationNo;
+            }
+        }
     },
 
     actions: {
@@ -29,6 +51,7 @@ export const useVoucherStore = defineStore({
                 .then(response => {
                     this.loading = false;
                     this.vouchers = response.data.result.data
+                    this.links = response.data.result.links
                     this.currentPage = response.data.result.current_page;
                     this.lastPage = response.data.result.last_page;
                     this.meta =  response.data.result;

@@ -45,9 +45,42 @@
                 </div>
             </div>
             </div>
-            <div class="flex justify-between mt-4">
-            <button class="px-4 py-2 bg-blue-500 text-white rounded">Prev</button>
-            <button class="px-4 py-2 bg-blue-500 text-white rounded">Next</button>
+            <div class="flex items-end justify-end pt-5">
+                <div class="flex items-start space-x-4 mr-5">
+                    <p class="mt-2">Row per page</p>
+                    <select v-model="data_filters.per_page" 
+                        class="mt-1 block w-20 py-2 px-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                        @change="func_changePerPage"
+                    >
+                        <option :value="page" v-for="(page, index) in [3,5,10]" :key="index">{{page}}</option>
+                    </select>
+                    <p v-if="meta" class="mt-2">{{ `${voucherStore.meta.from ?? 0} - ${voucherStore.meta.to ?? 0} of ${voucherStore.meta.total}` }}</p>
+                </div>
+                <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+ 
+                    <a class="cursor-pointer relative inline-flex items-center px-4 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                        :class="[voucherStore.currentPage == 1 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer']"
+                        :disabled="voucherStore.currentPage == 1" 
+                        @click="voucherStore.currentPage != 1 && func_paginateData(voucherStore.currentPage - 1)"
+                    >
+                        <i class="ph ph-caret-left"></i>
+                    </a>
+                
+                    <a class="cursor-pointer relative inline-flex items-center px-4 py-2 border  text-sm font-medium text-gray-700 hover:bg-gray-50"
+                        v-for="(link, index) in voucherStore.getLinks"
+                        :key="index"
+                        @click="func_paginateData(link.label)"
+                        :class="link.active ? 'border-blue-500 bg-blue-500 text-white' : 'border-gray-300 bg-white'"
+                    >{{ link.label }}</a>
+                
+                    <a class="relative inline-flex items-center px-4 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                        :class="[voucherStore.currentPage == voucherStore.lastPage ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer']"
+                        :disabled="voucherStore.currentPage == voucherStore.lastPage"
+                        @click="voucherStore.currentPage != voucherStore.lastPage && func_paginateData(voucherStore.currentPage + 1)"
+                    >
+                        <i class="ph ph-caret-right"></i>
+                    </a>
+                </nav>
             </div>
         </div>
     </div>
@@ -69,6 +102,26 @@ const data_filters = reactive({
 onMounted(() => {
     func_filterTable()
 })
+
+const func_changePerPage = async () => {
+    data_filters.current_page = 1
+    try {
+        await getVoucherByUserId(data_filters, JSON.parse(sessionStorage.user)?.id)
+    } catch (error) {
+        this.error = error.response;
+    }
+}
+
+const func_paginateData = async (page) => {
+    try {
+        console.log(page)
+        data_filters.current_page = page;
+        await getVoucherByUserId(data_filters, JSON.parse(sessionStorage.user)?.id)
+
+    } catch (error) {
+        this.error = error.response;
+    }
+}
 
 const func_rowNumber = (index) => {
     return (voucherStore.currentPage - 1) * voucherStore.meta.per_page + index + 1
